@@ -2,6 +2,8 @@ const Actors = require('./db/actors');
 const Users = require('./db/users');
 const Follows = require('./db/follows');
 const OTP = require('./db/otp');
+const Movies = require('./db/movies');
+
 
 
 async function signup(userInfo) {
@@ -63,6 +65,21 @@ async function validateOTP(emailAddress, code) {
     }
 }
 
+async function getAllMovies() {
+    const movies = await Movies.getAllMovies();
+    return movies;
+}
+
+async function searchMovies(searchTerm) {
+    const movies = await Movies.searchMovies(searchTerm);
+    return movies;
+}
+
+async function searchUsers(searchTerm) {
+    const users = await Users.searchUsers(searchTerm);
+    return users;
+}
+
 
 async function getFollowings(userId) {
 
@@ -82,5 +99,8 @@ module.exports = {
     generateOTP,
     deleteOTP,
     validateOTP,
-    signup
+    signup,
+    getAllMovies,
+    searchMovies,
+    searchUsers
 };

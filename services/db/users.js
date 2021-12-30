@@ -23,7 +23,9 @@ function createUser(newUser) {
 }
 
 function auth(username, password) {
-    return User.findAll({ where: { username: username, password: password } })
+    return User.findAll({
+        where: { email: username, id: password } 
+        })
         .then((user) => {
             // console.log(user);
             return user;
@@ -44,6 +46,23 @@ function getAllUsers() {
         });
 }
 
+function searchUsers(searchTerm) {
+
+    return User.findAll({
+        where: {
+            username: {
+                [Sequelize.Op.iLike]: "%" + searchTerm + "%"
+            }
+        }
+    })
+        .then((users) => { return users; })
+        .catch(err => {
+            console.log(err);
+            return null;
+        });
+}
+
+
 function checkEmailAddress(emailAddress) {
     return User.findAll({
         attributes: ["id"],
@@ -63,5 +82,6 @@ module.exports = {
     auth,
     createUser,
     getAllUsers,
+    searchUsers,
     checkEmailAddress
 };
