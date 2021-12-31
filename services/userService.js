@@ -25,10 +25,10 @@ async function checkEmail(emailAddress) {
 
     const users = await Users.checkEmailAddress(emailAddress);
     if (users.length != 1) {
-        return {found:false, id: null};
+        return {found:false, id: null, username: null};
 
     } else {
-        return {found: true, id: users[0].id};
+        return {found: true, id: users[0].id, username: users[0].username};
     }
 }
 

@@ -65,7 +65,7 @@ function searchUsers(searchTerm) {
 
 function checkEmailAddress(emailAddress) {
     return User.findAll({
-        attributes: ["id"],
+        attributes: ["id", "username"],
         where: {
             email: emailAddress
         }
