@@ -229,6 +229,13 @@ app.get('/getUserComments', async(req, res) => {
     res.send(comments);
 });
 
+//get movie comments
+app.get('/getMovieComments', async(req, res) => {
+    const comments = await userService.getMovieComments(req.query.id);
+    console.log(comments);
+    res.send(comments);
+});
+
 //download user image by user id
 app.get('/downloadUserImage', (req, res) => {
     console.log(req.query.id)

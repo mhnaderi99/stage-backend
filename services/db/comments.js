@@ -27,8 +27,20 @@ function getUserComments(userId) {
 }
 
 
+function getMovieComments(movieId) {
+    const query = `select movies.id,
+    movies.title,
+    users.username,
+    comments.comment_text 
+    from comments inner join users on comments.user_id = users.id inner join movies on comments.movie_id = movies.id
+    where movies.id = ${movieId}`;
+    return db.query(query,
+        { raw: true, type: db.QueryTypes.SELECT })
+}
+
 
 module.exports = {
     getAllComments,
-    getUserComments
+    getUserComments,
+    getMovieComments
 };

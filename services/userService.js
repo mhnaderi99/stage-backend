@@ -125,6 +125,12 @@ async function getUserComments(userId) {
     return comments
 }
 
+async function getMovieComments(movieId) {
+
+    const comments = await Comments.getMovieComments(movieId);
+    return comments
+}
+
 
 
 module.exports = {
@@ -141,5 +147,6 @@ module.exports = {
     getAllComments,
     getMovieById,
     getUserById,
-    getUserComments
+    getUserComments,
+    getMovieComments
 };
