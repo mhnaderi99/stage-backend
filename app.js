@@ -200,6 +200,21 @@ app.post('/signup', async(req, res) => {
 
 });
 
+
+//download user image by user id
+app.get('/downloadUserImage', (req, res) => {
+    console.log(req.query.id)
+    res.download(`../back/images/users/${req.query.id}.png`)
+});
+
+
+//download movie image by movie id
+app.get('/downloadMovieImage', (req, res) => {
+    res.download(`../back/images/movies/${req.query.id}.png`)
+});
+
+
+
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
 });
