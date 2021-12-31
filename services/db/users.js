@@ -46,6 +46,20 @@ function getAllUsers() {
         });
 }
 
+function getUserById(userId) {
+    return User.findAll({
+        attributes: ["id", "username"],
+        where: {
+            "id": userId
+        }
+    })
+        .then((users) => { return users; })
+        .catch(err => {
+            console.log(err);
+            return null;
+        });
+}
+
 function searchUsers(searchTerm) {
 
     return User.findAll({
@@ -83,5 +97,6 @@ module.exports = {
     createUser,
     getAllUsers,
     searchUsers,
-    checkEmailAddress
+    checkEmailAddress,
+    getUserById
 };

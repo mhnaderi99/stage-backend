@@ -141,6 +141,20 @@ app.use('/user/searchMovies', async(req, res) => {
     }
 });
 
+//get movie by id
+app.use('/getMovieById', async(req, res) => {
+    const movie = await userService.getMovieById(req.query.id);
+    console.log(movie);
+    res.send(movie);
+});
+
+//get user by id
+app.use('/getUserById', async(req, res) => {
+    const user = await userService.getUserById(req.query.id);
+    console.log(user);
+    res.send(user);
+});
+
 //search users
 app.use('/user/searchUsers', async(req, res) => {
     const b64auth = (req.headers.authorization || '').split(' ')[1] || '';
@@ -201,6 +215,20 @@ app.post('/signup', async(req, res) => {
 });
 
 
+//get all comments
+app.get('/getAllComments', async(req, res) => {
+    const comments = await userService.getAllComments();
+    console.log(comments);
+    res.send(comments);
+});
+
+//get user comments
+app.get('/getUserComments', async(req, res) => {
+    const comments = await userService.getUserComments(req.query.id);
+    console.log(comments);
+    res.send(comments);
+});
+
 //download user image by user id
 app.get('/downloadUserImage', (req, res) => {
     console.log(req.query.id)
@@ -210,7 +238,8 @@ app.get('/downloadUserImage', (req, res) => {
 
 //download movie image by movie id
 app.get('/downloadMovieImage', (req, res) => {
-    res.download(`../back/images/movies/${req.query.id}.png`)
+    console.log(req.query.id)
+    res.download(`../back/images/movies/${req.query.id}.jpg`)
 });
 
 

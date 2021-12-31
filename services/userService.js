@@ -3,6 +3,7 @@ const Users = require('./db/users');
 const Follows = require('./db/follows');
 const OTP = require('./db/otp');
 const Movies = require('./db/movies');
+const Comments = require('./db/comments');
 
 
 
@@ -92,6 +93,40 @@ async function getFollowers(userId) {
 }
 
 
+async function getAllComments() {
+
+    const comments = await Comments.getAllComments();
+    return comments;
+}
+
+async function getMovieById(movieId) {
+
+    const movies = await Movies.getMovieById(movieId);
+    if (movies.length < 1) {
+        return []
+    } else {
+        return movies[0];
+    }
+}
+
+async function getUserById(userId) {
+
+    const users = await Users.getUserById(userId);
+    if (users.length < 1) {
+        return []
+    } else {
+        return users[0];
+    }
+}
+
+async function getUserComments(userId) {
+
+    const comments = await Comments.getUserComments(userId);
+    return comments
+}
+
+
+
 module.exports = {
     getFollowings,
     getFollowers,
@@ -102,5 +137,9 @@ module.exports = {
     signup,
     getAllMovies,
     searchMovies,
-    searchUsers
+    searchUsers,
+    getAllComments,
+    getMovieById,
+    getUserById,
+    getUserComments
 };

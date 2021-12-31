@@ -23,6 +23,21 @@ function getAllMovies() {
         });
 }
 
+function getMovieById(movieId) {
+    const query = `select movies.id as id,
+    movies.title as title,
+    movies.year as year,
+    movies.summary as summary,
+    movies.length as length,
+    categories.name as category,
+    concat(directors.firstname, ' ', directors.lastname) as director
+    from movies inner join categories on movies.category_id = categories.id inner join directors on movies.director_id = directors.id
+    where movies.id = ${movieId}`;
+    
+    return db.query(query,
+        { raw: true, type: db.QueryTypes.SELECT })
+}
+
 
 function searchMovies(searchTerm) {
     return Asc.Movie.findAll({
@@ -60,7 +75,10 @@ function searchMovies(searchTerm) {
 }
 
 
+
+
 module.exports = {
     getAllMovies,
-    searchMovies
+    searchMovies,
+    getMovieById
 };
