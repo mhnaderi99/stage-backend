@@ -5,6 +5,7 @@ const OTP = require('./db/otp');
 const Movies = require('./db/movies');
 const Comments = require('./db/comments');
 
+var nodemailer = require('nodemailer');
 
 
 async function signup(userInfo) {
@@ -35,9 +36,34 @@ async function checkEmail(emailAddress) {
 
 async function generateOTP(emailAddress) {
 
-    const newOTP = {"email": emailAddress, "code": "1234"};
+    var code = (Math.floor(Math.random() * 9000) + 1000).toString();
+    const newOTP = {"email": emailAddress, "code": code};
     const createdOTP = await OTP.generateOTP(newOTP);
     if (createdOTP != null) {
+        // send email
+        var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: 'stage.application.helper@gmail.com',
+              pass: 'P@$$W0rD'
+            }
+          });
+          
+          var mailOptions = {
+            from: 'stage.application.helper@gmail.com',
+            to: emailAddress,
+            subject: 'Stage One-Time Login Code',
+            text: `Your one-time login code to Stage is ${code}.\nPlease enter this code in the application.`
+          };
+
+          transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+          });
+            
         return { stat: true, message: "successfuly generated OTP" };
     } else {
         return { stat: true, message: "could not generate OTP" };
@@ -84,18 +110,37 @@ async function searchUsers(searchTerm) {
 
 async function getFollowings(userId) {
 
-    return Follows.getFollowings(userId);
+    
+    return await Follows.getFollowings(userId);
 }
 
 async function getFollowers(userId) {
 
-    return Follows.getFollowers(userId);
+    return await Follows.getFollowers(userId);
 }
 
+async function follow(follower_id, following_id) {
+    return await Follows.follow(follower_id, following_id);
+}
+
+async function unfollow(follower_id, following_id) {
+    return await Follows.unfollow(follower_id, following_id);
+}
+
+async function sendComment(userId, movieId, commentText) {
+    var newComment = {user_id: userId, movie_id: movieId, comment_text: commentText};
+    return await Comments.sendComment(newComment);
+}
 
 async function getAllComments() {
 
     const comments = await Comments.getAllComments();
+    return comments;
+}
+
+async function getTimelineComments(userId) {
+
+    const comments = await Comments.getTimelineComments(userId);
     return comments;
 }
 
@@ -105,7 +150,7 @@ async function getMovieById(movieId) {
     if (movies.length < 1) {
         return []
     } else {
-        return movies[0];
+        return movies;
     }
 }
 
@@ -131,6 +176,14 @@ async function getMovieComments(movieId) {
     return comments
 }
 
+async function checkFollow(userId1, userId2) {
+
+    const result = await Follows.checkFollow(userId1, userId2);
+    return result[0];
+}
+
+
+
 
 
 module.exports = {
@@ -145,8 +198,13 @@ module.exports = {
     searchMovies,
     searchUsers,
     getAllComments,
+    getTimelineComments,
     getMovieById,
     getUserById,
     getUserComments,
-    getMovieComments
+    getMovieComments,
+    follow,
+    checkFollow,
+    unfollow,
+    sendComment
 };

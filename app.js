@@ -83,10 +83,94 @@ app.get('/user/getFollowings', async(req, res) => {
     const authResult = await authService.userAuth(login, password);
     // Verify login and password are set and correct
     if (authResult != null && authResult.length == 1) {
-        if (login && password && login === authResult[0].username && password === authResult[0].password) {
+        if (login && password && login === authResult[0].email && password == authResult[0].id) {
             // Access granted...
-            const followings = await userService.getFollowings(authResult[0].id);
+            const followings = await userService.getFollowings(req.query.id);
+            console.log(followings);
             res.send(followings);
+        }
+
+    } else {
+        // Access denied...
+        res.set('WWW-Authenticate', 'Basic realm="401"'); // change this
+        res.status(401).send('Authentication required.'); // custom message
+    }
+});
+
+//get followers
+app.get('/user/getFollowers', async(req, res) => {
+    const b64auth = (req.headers.authorization || '').split(' ')[1] || '';
+    const [login, password] = Buffer.from(b64auth, 'base64').toString().split(':');
+    const authResult = await authService.userAuth(login, password);
+    // Verify login and password are set and correct
+    if (authResult != null && authResult.length == 1) {
+        if (login && password && login === authResult[0].email && password == authResult[0].id) {
+            // Access granted...
+            const followers = await userService.getFollowers(req.query.id);
+            console.log(followers);
+            res.send(followers);
+        }
+
+    } else {
+        // Access denied...
+        res.set('WWW-Authenticate', 'Basic realm="401"'); // change this
+        res.status(401).send('Authentication required.'); // custom message
+    }
+});
+
+//follow
+app.post('/user/follow', async(req, res) => {
+    const b64auth = (req.headers.authorization || '').split(' ')[1] || '';
+    const [login, password] = Buffer.from(b64auth, 'base64').toString().split(':');
+    const authResult = await authService.userAuth(login, password);
+    // Verify login and password are set and correct
+    if (authResult != null && authResult.length == 1) {
+        if (login && password && login === authResult[0].email && password == authResult[0].id) {
+            // Access granted...
+            const followed = await userService.follow(password, req.query.id);
+            console.log(followed);
+            res.send(followed);
+        }
+
+    } else {
+        // Access denied...
+        res.set('WWW-Authenticate', 'Basic realm="401"'); // change this
+        res.status(401).send('Authentication required.'); // custom message
+    }
+});
+
+//unfollow
+app.post('/user/unfollow', async(req, res) => {
+    const b64auth = (req.headers.authorization || '').split(' ')[1] || '';
+    const [login, password] = Buffer.from(b64auth, 'base64').toString().split(':');
+    const authResult = await authService.userAuth(login, password);
+    // Verify login and password are set and correct
+    if (authResult != null && authResult.length == 1) {
+        if (login && password && login === authResult[0].email && password == authResult[0].id) {
+            // Access granted...
+            const unfollowed = await userService.unfollow(password, req.query.id);
+            console.log(unfollowed);
+            res.send(unfollowed.toString());
+        }
+
+    } else {
+        // Access denied...
+        res.set('WWW-Authenticate', 'Basic realm="401"'); // change this
+        res.status(401).send('Authentication required.'); // custom message
+    }
+});
+
+//checkFollow
+app.get('/user/checkFollow', async(req, res) => {
+    const b64auth = (req.headers.authorization || '').split(' ')[1] || '';
+    const [login, password] = Buffer.from(b64auth, 'base64').toString().split(':');
+    const authResult = await authService.userAuth(login, password);
+    // Verify login and password are set and correct
+    if (authResult != null && authResult.length == 1) {
+        if (login && password && login === authResult[0].email && password == authResult[0].id) {
+            // Access granted...
+            const ifFollowed = await userService.checkFollow(password, req.query.id);
+            res.send(ifFollowed);
         }
 
     } else {
@@ -214,12 +298,58 @@ app.post('/signup', async(req, res) => {
 
 });
 
+//send comment
+app.post('/user/sendComment', async(req, res) => {
+    const b64auth = (req.headers.authorization || '').split(' ')[1] || '';
+    const [login, password] = Buffer.from(b64auth, 'base64').toString().split(':');
+    const authResult = await authService.userAuth(login, password);
+    // Verify login and password are set and correct
+    if (authResult != null && authResult.length == 1) {
+        if (login && password && login === authResult[0].email && password == authResult[0].id) {
+            // Access granted...
+            const createdComment = await userService.sendComment(password, req.body.movieId, req.body.commentText);
+            res.send(createdComment);
+        }
+
+    } else {
+        // Access denied...
+        res.set('WWW-Authenticate', 'Basic realm="401"'); // change this
+        res.status(401).send('Authentication required.'); // custom message
+    }
+
+});
+
 
 //get all comments
 app.get('/getAllComments', async(req, res) => {
     const comments = await userService.getAllComments();
     console.log(comments);
     res.send(comments);
+});
+
+//get timeline comments
+app.get('/user/getTimelineComments', async(req, res) => {
+
+    const b64auth = (req.headers.authorization || '').split(' ')[1] || '';
+    const [login, password] = Buffer.from(b64auth, 'base64').toString().split(':');
+    const authResult = await authService.userAuth(login, password);
+    // Verify login and password are set and correct
+    if (authResult != null && authResult.length == 1) {
+        if (login && password && login === authResult[0].email && password == authResult[0].id) {
+            // Access granted...
+            const comments = await userService.getTimelineComments(authResult[0].id);
+            console.log(comments);
+            res.send(comments);
+        }
+
+    } else {
+        // Access denied...
+        res.set('WWW-Authenticate', 'Basic realm="401"'); // change this
+        res.status(401).send('Authentication required.'); // custom message
+    }
+    
+    
+
 });
 
 //get user comments
@@ -249,6 +379,11 @@ app.get('/downloadMovieImage', (req, res) => {
     res.download(`../back/images/movies/${req.query.id}.jpg`)
 });
 
+
+app.post('/uploadUserImage', (req, res) => {
+    console.log("req umad");
+    res.send("OK");
+});
 
 
 app.listen(port, () => {

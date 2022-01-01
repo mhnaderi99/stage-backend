@@ -14,6 +14,15 @@ function getAllComments() {
         { raw: true, type: db.QueryTypes.SELECT })
 }
 
+function getTimelineComments(userId) {
+    const query = `select movies.id, movies.title, users.username, users.id as user_id, comments.comment_text 
+                    from comments inner join users on comments.user_id = users.id inner join movies on comments.movie_id = movies.id
+                    where user_id in (select following_id from follows where follower_id = ${userId})
+                    order by comments.createdat desc`;
+    return db.query(query,
+        { raw: true, type: db.QueryTypes.SELECT })
+}
+
 
 function getUserComments(userId) {
     const query = `select movies.id,
@@ -21,7 +30,8 @@ function getUserComments(userId) {
     users.username,
     comments.comment_text 
     from comments inner join users on comments.user_id = users.id inner join movies on comments.movie_id = movies.id
-    where users.id = ${userId}`;
+    where users.id = ${userId}
+    order by comments.createdat desc`;
     return db.query(query,
         { raw: true, type: db.QueryTypes.SELECT })
 }
@@ -30,17 +40,34 @@ function getUserComments(userId) {
 function getMovieComments(movieId) {
     const query = `select movies.id,
     movies.title,
+    users.id as user_id,
     users.username,
     comments.comment_text 
     from comments inner join users on comments.user_id = users.id inner join movies on comments.movie_id = movies.id
-    where movies.id = ${movieId}`;
+    where movies.id = ${movieId}
+    order by comments.createdat desc`;
     return db.query(query,
         { raw: true, type: db.QueryTypes.SELECT })
+}
+
+function sendComment(newComment) {
+    //newFollow = {follower_id: followerId, following_id: followingId}
+    return Comment.create(newComment)
+        .then((createdComment) => {
+            console.log(createdComment);
+            return createdComment;
+        })
+        .catch(err => {
+            console.log(err);
+            return null;
+        });
 }
 
 
 module.exports = {
     getAllComments,
     getUserComments,
-    getMovieComments
+    getMovieComments,
+    sendComment,
+    getTimelineComments
 };
